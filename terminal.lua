@@ -26,6 +26,7 @@ function Terminal:getElements()
 end
 
 ---@param point Point
+--- might need a "drawAtPos" function
 function Terminal:setCursorPos(point)
   if point.x < self.cols and point.y < self.rows then
     io.write(string.format("\x1b[%d;%dH", point.y, point.x))
