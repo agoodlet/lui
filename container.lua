@@ -58,8 +58,8 @@ function Container:draw()
 
   -- corners
   -- old way
-  local topLeft = string.format("\x1b[%d;%dH", self._starty, self._startx)
-  io.write(topLeft, BOX_CORNER_TOP_LEFT)
+  -- local topLeft = string.format("\x1b[%d;%dH", self._starty, self._startx)
+  -- io.write(topLeft, BOX_CORNER_TOP_LEFT)
 
   -- new way
   term:setCursorPos({ x = self._starty, y = self._startx })
