@@ -1,4 +1,11 @@
-local Terminal = require("terminal")
+---@class lui.Container
+---@field private _startx number
+---@field private _starty number
+---@field private _endx number
+---@field private _endy number
+---@field private _elements table # A list of elements contained within this container
+
+local Terminal = require("lui.terminal")
 local term = Terminal.new()
 
 local Container = {}
@@ -18,18 +25,27 @@ local Direction = {
 	Horizontal = 2,
 }
 
-function Container.new(startx, starty, endx, endy, name, body)
+---@param startPoint Point
+---@param endPoint Point
+function Container.new(startPoint, endPoint)
 	local self = {}
 
-	self._startx = startx or 0
-	self._starty = starty or 0
-	self._endx = endx or 0
-	self._endy = endy or 0
-	self._name = name or nil
-	self._body = body or nil
+	self._startx = startPoint.x or 0
+	self._starty = startPoint.y or 0
+	self._endx = endPoint.x or 0
+	self._endy = endPoint.y or 0
+	self._elements = {}
 
 	setmetatable(self, Container)
 	return self
+end
+
+-- TODO define an element interface
+function Container:addElement(element)
+	-- rewrite the Point of the element to be relative to the Container
+	-- if the new point is outside the bounds of the container, what do?
+	element:updatePoint({ x = self._startx + element.startPoint.x, y = self._starty + element.startPoint.y })
+	table.insert(self._elements, element)
 end
 
 ---@param startPoint Point
@@ -37,6 +53,7 @@ end
 ---@param direction Direction
 function Container:_drawLine(startPoint, endPoint, direction)
 	local character = direction == Direction.Vertical and BOX_VERTICAL or BOX_HORIZONTAL
+	-- I feel like there's a way to get rid of the if here
 	if direction == Direction.Vertical then
 		local counter = startPoint.y
 		while counter < endPoint.y do
@@ -71,13 +88,10 @@ function Container:draw()
 	term:drawAtPos({ x = self._startx, y = self._endy }, BOX_CORNER_BOTTOM_LEFT)
 	term:drawAtPos({ x = self._endx, y = self._endy }, BOX_CORNER_BOTTOM_RIGHT)
 
-	-- heading and body should be elements of the container and be recursively drawn
-	term:drawAtPos({ x = self._startx + 1, y = self._starty + 1 }, self._name)
-
-	-- render the body content
-	-- needs wrapping logic to wrap when the line would outgrow the container
-	-- endx - startx to get total cols of container
-	-- at that many characters, increment y and reset x at previous space
+	-- recursively render elements of container
+	for _, v in pairs(self._elements) do
+		v:draw()
+	end
 end
 
 return Container
