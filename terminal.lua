@@ -35,6 +35,13 @@ function Terminal:setCursorPos(point)
   end
 end
 
+---@param point Point
+---@param character string
+function Terminal:drawAtPos(point, character)
+  self:setCursorPos(point)
+  io.write(character)
+end
+
 function Terminal:render()
   io.write("\x1bc")
   for _, v in pairs(self._elements) do

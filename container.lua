@@ -12,6 +12,12 @@ local BOX_CORNER_TOP_RIGHT = "┐"
 local BOX_CORNER_BOTTOM_LEFT = "└"
 local BOX_CORNER_BOTTOM_RIGHT = "┘"
 
+---@enum Direction
+local Direction = {
+	Vertical = 1,
+	Horizontal = 2,
+}
+
 function Container.new(startx, starty, endx, endy, name, body)
 	local self = {}
 
@@ -26,51 +32,47 @@ function Container.new(startx, starty, endx, endy, name, body)
 	return self
 end
 
+---@param startPoint Point
+---@param endPoint Point
+---@param direction Direction
+function Container:_drawLine(startPoint, endPoint, direction)
+	local character = direction == Direction.Vertical and BOX_VERTICAL or BOX_HORIZONTAL
+	if direction == Direction.Vertical then
+		local counter = startPoint.y
+		while counter < endPoint.y do
+			term:drawAtPos({ x = startPoint.x, y = counter }, character)
+			counter = counter + 1
+		end
+	else
+		local counter = startPoint.x
+		while counter < endPoint.x do
+			term:drawAtPos({ x = counter, y = startPoint.y }, character)
+			counter = counter + 1
+		end
+	end
+end
+
 function Container:draw()
-	-- can I abstract this to a separate func call
-	local top = self._startx
-	while top < self._endx do
-		local position = string.format("\x1b[%d;%dH", self._starty, top)
-		io.write(position, BOX_HORIZONTAL)
-		top = top + 1
-	end
+	-- top
+	self:_drawLine({ x = self._startx, y = self._starty }, { x = self._endx, y = self._starty }, Direction.Horizontal)
 
-	local bottom = self._startx
-	while bottom <= self._endx do
-		local position = string.format("\x1b[%d;%dH", self._endy, bottom)
-		io.write(position, BOX_HORIZONTAL)
-		bottom = bottom + 1
-	end
+	-- bottom
+	self:_drawLine({ x = self._startx, y = self._endy }, { x = self._endx, y = self._endy }, Direction.Horizontal)
 
-	local right = self._starty
-	while right < self._endy do
-		local position = string.format("\x1b[%d;%dH", right, self._endx)
-		io.write(position, BOX_VERTICAL)
-		right = right + 1
-	end
+	-- left line
+	self:_drawLine({ x = self._startx, y = self._starty }, { x = self._startx, y = self._endy }, Direction.Vertical)
 
-	local left = self._starty
-	while left < self._endy do
-		local position = string.format("\x1b[%d;%dH", left, self._startx)
-		io.write(position, BOX_VERTICAL)
-		left = left + 1
-	end
+	-- right
+	self:_drawLine({ x = self._endx, y = self._starty }, { x = self._endx, y = self._endy }, Direction.Vertical)
 
 	-- corners
-	term:setCursorPos({ x = self._startx, y = self._starty })
-	io.write(BOX_CORNER_TOP_LEFT)
+	term:drawAtPos({ x = self._startx, y = self._starty }, BOX_CORNER_TOP_LEFT)
+	term:drawAtPos({ x = self._endx, y = self._starty }, BOX_CORNER_TOP_RIGHT)
+	term:drawAtPos({ x = self._startx, y = self._endy }, BOX_CORNER_BOTTOM_LEFT)
+	term:drawAtPos({ x = self._endx, y = self._endy }, BOX_CORNER_BOTTOM_RIGHT)
 
-	term:setCursorPos({ x = self._endx, y = self._starty })
-	io.write(BOX_CORNER_TOP_RIGHT)
-
-	term:setCursorPos({ x = self._startx, y = self._endy })
-	io.write(BOX_CORNER_BOTTOM_LEFT)
-
-	term:setCursorPos({ x = self._endx, y = self._endy })
-	io.write(BOX_CORNER_BOTTOM_RIGHT)
-
-	term:setCursorPos({ x = self._startx + 1, y = self._starty + 1 })
-	io.write(self._name)
+	-- heading and body should be elements of the container and be recursively drawn
+	term:drawAtPos({ x = self._startx + 1, y = self._starty + 1 }, self._name)
 
 	-- render the body content
 	-- needs wrapping logic to wrap when the line would outgrow the container
