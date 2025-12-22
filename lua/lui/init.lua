@@ -1,8 +1,8 @@
 ---@class lui
----@field terminal lui.Terminal
----@field container lui.Container
----@field point lui.Point
----@field text lui.Text
+---@field terminal Terminal
+---@field container Container
+---@field point Point
+---@field text Text
 local M = {}
 
 -- Require the sub-modules

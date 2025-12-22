@@ -9,13 +9,13 @@ Point.__index = Point
 ---@param y number
 ---@return Point
 function Point.new(x, y)
-  local self = {}
+	local self = {}
 
-  self.x = x or 0
-  self.y = y or 0
+	self.x = x or 0
+	self.y = y or 0
 
-  setmetatable(self, Point)
-  return self
+	setmetatable(self, Point)
+	return self
 end
 
 return Point

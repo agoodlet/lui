@@ -1,6 +1,9 @@
 ---@class Text
 ---@field startPoint Point
 ---@field private _content string
+---@field new fun(startPoint: Point, content: string)
+---@field updatePoint fun(newPoint: Point)
+---@field draw fun()
 
 local Terminal = require("lui.terminal")
 

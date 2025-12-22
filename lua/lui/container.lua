@@ -1,9 +1,11 @@
----@class lui.Container
+---@class Container
 ---@field private _startx number
 ---@field private _starty number
 ---@field private _endx number
 ---@field private _endy number
 ---@field private _elements table # A list of elements contained within this container
+---@field new fun(startPoint: Point, endPoint: Point)
+---@field addElement fun(self, element)
 
 local Terminal = require("lui.terminal")
 local term = Terminal.new()
@@ -44,6 +46,7 @@ end
 function Container:addElement(element)
 	-- rewrite the Point of the element to be relative to the Container
 	-- if the new point is outside the bounds of the container, what do?
+	print(self._startx)
 	element:updatePoint({ x = self._startx + element.startPoint.x, y = self._starty + element.startPoint.y })
 	table.insert(self._elements, element)
 end

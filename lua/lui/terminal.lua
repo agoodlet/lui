@@ -2,6 +2,11 @@
 ---@field rows number
 ---@field cols number
 ---@field private _elements table
+---@field new function
+---@field addElement fun(self, element: table)
+---@field getElements fun()
+---@field setCursorPos fun(point: Point)
+---@field render fun()
 
 local Terminal = {}
 Terminal.__index = Terminal
@@ -49,6 +54,7 @@ end
 function Terminal:render()
 	io.write("\x1bc")
 	for _, v in pairs(self._elements) do
+		-- if the element already exists don't draw it again
 		v:draw()
 	end
 
